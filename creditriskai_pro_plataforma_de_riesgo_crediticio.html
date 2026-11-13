@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CreditRiskAI PRO – Inteligencia de Riesgo Crediticio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-main: #070d19;
+    --bg-side: #040812;
+    --bg-card: #0c1526;
+    --bg-card-alt: #101c33;
+    --bg-input: #08101f;
+    --bg-hover: rgba(56, 189, 248, 0.08);
+    --bg-active: rgba(56, 189, 248, 0.14);
+    --border-subtle: rgba(56, 189, 248, 0.14);
+    --border-strong: rgba(56, 189, 248, 0.32);
+    --text-main: #f1f5f9;
+    --text-muted: #8ea3c2;
+    --accent-cyan: #38bdf8;
+    --accent-blue: #2563eb;
+    --hero-grad: linear-gradient(135deg, #0c1932 0%, #091326 60%, #0d2142 100%);
+    --card-grad: linear-gradient(180deg, rgba(16, 28, 51, 0.75) 0%, rgba(10, 18, 34, 0.95) 100%);
+  }
+
+  html.light {
+    --bg-main: #f1f5f9;
+    --bg-side: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-alt: #f8fafc;
+    --bg-input: #f8fafc;
+    --bg-hover: rgba(2, 132, 199, 0.06);
+    --bg-active: rgba(2, 132, 199, 0.12);
+    --border-subtle: #e2e8f0;
+    --border-strong: #93c5fd;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --accent-cyan: #0284c7;
+    --accent-blue: #1d4ed8;
+    --hero-grad: linear-gradient(135deg, #e0f2fe 0%, #eff6ff 60%, #dbeafe 100%);
+    --card-grad: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    margin: 0;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background-color: var(--bg-side);
+    border-right: 1px solid var(--border-subtle);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+  }
+
+  .nav-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-main);
+  }
+
+  .nav-item.active {
+    background: var(--bg-active);
+    color: var(--text-main);
+    font-weight: 600;
+    border-color: var(--border-strong);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.08);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 20%;
+    height: 60%;
+    width: 3px;
+    border-radius: 0 4px 4px 0;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 10px var(--accent-cyan);
+  }
+
+  /* Hero Banner */
+  .hero-banner {
+    background: var(--hero-grad);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.45);
+  }
+
+  .hero-banner::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.14) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Cards & KPIs */
+  .fintech-card {
+    background: var(--card-grad);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 6px 24px -6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .kpi-card {
+    background: var(--card-grad);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 18px 20px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+    box-shadow: 0 10px 25px -8px rgba(56, 189, 248, 0.15);
+  }
+
+  .kpi-card.danger-accent {
+    border-left: 3px solid #f43f5e;
+  }
+
+  .metric-box {
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 14px 18px;
+  }
+
+  /* Inputs & Buttons */
+  .fintech-input, .fintech-select {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
+    border-radius: 10px;
+    padding: 9px 13px;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+  }
+
+  .fintech-input:focus, .fintech-select:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.28);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+  }
+
+  .btn-secondary {
+    background: var(--bg-card-alt);
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.18s ease;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-strong);
+    background: var(--bg-hover);
+  }
+
+  .btn-secondary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Table Styling */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .data-table th {
+    text-align: left;
+    padding: 11px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+  }
+
+  .data-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+  }
+
+  .data-table tbody tr:hover td {
+    background-color: var(--bg-hover);
+  }
+
+  /* Badges */
+  .pill-tag {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    background: rgba(56, 189, 248, 0.1);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.22);
+  }
+
+  html.light .pill-tag {
+    background: #e0f2fe;
+    color: #0369a1;
+    border-color: #bae6fd;
+  }
+
+  .grade-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+  }
+
+  .status-paid {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: rgba(16, 185, 129, 0.14);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .status-default {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: rgba(244, 63, 94, 0.14);
+    color: #fb7185;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+  }
+
+  /* Tech Mode Visibility */
+  body.user-mode .tech-only {
+    display: none !important;
+  }
+
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.45); }
+
+  @media print {
+    .sidebar, .no-print { display: none !important; }
+    body { background: #fff; color: #000; }
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col lg:flex-row user-mode">
+
+  <!-- SIDEBAR IZQUIERDO -->
+  <aside class="sidebar w-full lg:w-72 p-5 shrink-0 flex flex-col justify-between z-20">
+    <div>
+      <!-- Top Bar del Sidebar: Avatar Geométrico + Botón Tema -->
+      <div class="flex items-start justify-between mb-4">
+        <div class="w-6"></div>
+        <!-- Mascota Geométrica Estilizada (Gato/Zorro Fintech) -->
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-b from-sky-400/20 to-blue-600/10 border border-sky-400/30 flex items-center justify-center shadow-lg shadow-sky-500/10 mb-2.5">
+            <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="catGrad" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#e0f2fe"/>
+                  <stop offset="55%" stop-color="#7dd3fc"/>
+                  <stop offset="100%" stop-color="#38bdf8"/>
+                </linearGradient>
+              </defs>
+              <!-- Orejas y cabeza geométrica -->
+              <path d="M14 10L24 20H40L50 10L53 34C53 46.1503 43.598 54 32 54C20.402 54 11 46.1503 11 34L14 10Z" fill="url(#catGrad)"/>
+              <!-- Interior orejas -->
+              <path d="M17 15L22 20H16L17 15Z" fill="#070d19" fill-opacity="0.45"/>
+              <path d="M47 15L42 20H48L47 15Z" fill="#070d19" fill-opacity="0.45"/>
+              <!-- Ojos -->
+              <circle cx="24" cy="34" r="3" fill="#070d19"/>
+              <circle cx="40" cy="34" r="3" fill="#070d19"/>
+              <circle cx="25" cy="33" r="1" fill="#ffffff"/>
+              <circle cx="41" cy="33" r="1" fill="#ffffff"/>
+              <!-- Hocico -->
+              <path d="M29.5 40H34.5L32 43L29.5 40Z" fill="#070d19"/>
+              <path d="M28 45C29.5 46.5 31 46.5 32 44.5C33 46.5 34.5 46.5 36 45" stroke="#070d19" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="text-sm font-bold tracking-tight">¿Qué desea realizar?</span>
+          <span class="text-[11px] text-sky-400 font-medium mt-0.5">CreditRiskAI PRO</span>
+        </div>
+
+        <!-- Botón Tema (Sol / Luna) en la esquina superior derecha como la referencia -->
+        <button onclick="toggleTheme()" title="Cambiar tema claro/oscuro" class="p-2 rounded-lg border border-sky-400/20 bg-sky-400/5 hover:bg-sky-400/15 text-sky-400 transition cursor-pointer">
+          <svg id="icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg id="icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+
+      <!-- Buscador rápido de módulos -->
+      <div class="relative mb-5">
+        <span class="absolute inset-y-0 left-3 flex items-center text-sky-400/70 text-xs mono">&lt;/&gt;</span>
+        <input id="quick-nav-search" type="text" oninput="filterNavModules(this.value)" placeholder="Analizar o buscar módulo..." class="fintech-input pl-10 py-2 text-xs">
+      </div>
+
+      <!-- Lista de Módulos -->
+      <div class="text-[10.5px] font-bold uppercase tracking-widest opacity-60 px-2 mb-2">MÓDULOS</div>
+      <nav id="sidebar-nav" class="flex flex-col gap-1">
+        <button class="nav-item active" data-keywords="inicio resumen cartera eda kpi graficos" onclick="switchTab('sec1', this)">
+          <span class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Inicio
+          </span>
+          <span class="tech-only mono text-[10px] opacity-60">EDA</span>
+        </button>
+
+        <button class="nav-item" data-keywords="ordenamiento clasificar sort quick merge bubble" onclick="switchTab('sec3', this)">
+          <span class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="9" y2="18"/></svg>
+            Ordenamiento
+          </span>
+          <span class="tech-only mono text-[10px] opacity-60">O(n log n)</span>
+        </button>
+
+        <button class="nav-item" data-keywords="busqueda localizar filtrar kmp binaria" onclick="switchTab('sec2', this)">
+          <span class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Búsqueda
+          </span>
+          <span class="tech-only mono text-[10px] opacity-60">KMP / Bin</span>
+        </button>
+
+        <button class="nav-item" data-keywords="optimizacion cartera presupuesto inversion capital" onclick="switchTab('sec5', this)">
+          <span class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            Optimización
+          </span>
+          <span class="tech-only mono text-[10px] opacity-60">DP / Greedy</span>
+        </button>
+
+        <button class="nav-item" data-keywords="grafo red agencias rutas dijkstra mapa" onclick="switchTab('sec6', this)">
+          <span class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Análisis de Grafo
+          </span>
+          <span class="tech-only mono text-[10px] opacity-60">Dijkstra</span>
+        </button>
+
+        <button class="nav-item" data-keywords="simulador what if evaluar cliente riesgo credito" onclick="switchTab('sec8', this)">
+          <span class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Evaluador What-If
+          </span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-semibold">PRO</span>
+        </button>
+
+        <button class="nav-item" data-keywords="arboles indice avl rojo negro estructura" onclick="switchTab('sec4', this)">
+          <span class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="4" rx="1"/><rect x="3" y="17" width="6" height="4" rx="1"/><rect x="15" y="17" width="6" height="4" rx="1"/><path d="M12 7v5M6 17v-5h12v5"/></svg>
+            Árboles Índice
+          </span>
+          <span class="tech-only mono text-[10px] opacity-60">AVL / RB</span>
+        </button>
+
+        <button class="nav-item" data-keywords="reportes exportar descargar csv json pdf" onclick="switchTab('sec10', this)">
+          <span class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Reportes & Exportar
+          </span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Pie del Sidebar: Switch Modo Usuario / Modo Técnico -->
+    <div class="mt-6 pt-4 border-t border-sky-400/10 space-y-3">
+      <div class="p-3 rounded-xl bg-sky-950/30 border border-sky-400/15">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-xs font-semibold" id="mode-label">Modo Usuario</div>
+            <div class="text-[10.5px] opacity-60" id="mode-sub">Vista limpia de negocio</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="tech-switch" class="sr-only peer" onchange="toggleTechMode(this.checked)">
+            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-500"></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between text-[11px] opacity-60 px-1">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Dataset conectado
+        </span>
+        <span class="mono">v2.5 PRO</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 p-5 sm:p-7 lg:p-9 overflow-x-hidden max-w-[1400px] mx-auto w-full">
+
+    <!-- Notificación flotante -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-sky-600 text-white px-4 py-3 rounded-xl shadow-xl border border-sky-400/30 text-xs font-semibold tracking-wide transition-all"></div>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 1: INICIO (RESUMEN DE CARTERA)                                 -->
+    <!-- ===================================================================== -->
+    <section id="sec1" class="module-sec space-y-6">
+      <!-- Banner Hero -->
+      <div class="hero-banner flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-widest text-sky-400 mb-1.5">MÓDULO • PANEL GENERAL</div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">Resumen de Cartera</h1>
+          <p class="text-xs sm:text-sm opacity-75 max-w-2xl leading-relaxed">
+            Supervisa el comportamiento global de los préstamos, analiza la tasa de cumplimiento por perfil crediticio y explora los registros activos del dataset.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+          <label class="btn-secondary cursor-pointer">
+            <span>📂 Cargar CSV</span>
+            <input type="file" id="upl" accept=".csv" class="hidden" onchange="handleCSVUpload(this)">
+          </label>
+          <button class="btn-primary" onclick="switchTab('sec8', document.querySelector('[onclick*=\'sec8\']'))">
+            <span>✨ Evaluar Nuevo Cliente</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Fila de 4 Tarjetas KPI (Idéntica estructura a la referencia) -->
+      <div id="kpis" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="kpi-card">
+          <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">PRÉSTAMOS</div>
+          <div class="text-3xl font-extrabold mt-1.5 tracking-tight">32,581</div>
+          <div class="text-xs opacity-60 mt-1">registros en el dataset</div>
+        </div>
+        <div class="kpi-card">
+          <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">MONTO TOTAL</div>
+          <div class="text-3xl font-extrabold mt-1.5 tracking-tight">$312.4M</div>
+          <div class="text-xs opacity-60 mt-1 mono">$312,431,300</div>
+        </div>
+        <div class="kpi-card">
+          <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">TASA PROMEDIO</div>
+          <div class="text-3xl font-extrabold mt-1.5 tracking-tight">10.0%</div>
+          <div class="text-xs opacity-60 mt-1">interés anual</div>
+        </div>
+        <div class="kpi-card danger-accent">
+          <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">TASA DE DEFAULT</div>
+          <div class="text-3xl font-extrabold mt-1.5 tracking-tight text-rose-500">21.8%</div>
+          <div class="text-xs opacity-60 mt-1">préstamos incumplidos</div>
+        </div>
+      </div>
+
+      <!-- Gráficos Interactivos -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="fintech-card lg:col-span-2">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-sm font-bold">Cumplimiento vs. Impago por Grado Crediticio</h3>
+              <p class="text-xs opacity-60">Distribución porcentual según calificación de riesgo (A = Mínimo, G = Crítico)</p>
+            </div>
+            <span class="pill-tag">A – G</span>
+          </div>
+          <div class="h-60">
+            <canvas id="ch-grade"></canvas>
+          </div>
+        </div>
+
+        <div class="fintech-card">
+          <div class="mb-3">
+            <h3 class="text-sm font-bold">Propósito del Préstamo</h3>
+            <p class="text-xs opacity-60">Participación por destino declarado</p>
+          </div>
+          <div class="h-60 flex items-center justify-center">
+            <canvas id="ch-intent"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explorador de Préstamos -->
+      <div class="fintech-card">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-base font-bold">Explorador de Préstamos</h3>
+            <p class="text-xs opacity-60">Filtra rápidamente por grado de riesgo o estado de pago.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="f-grade" class="fintech-select w-auto text-xs" onchange="filterHomeTable()">
+              <option value="">Todos los Grados</option>
+              <option value="A">Grado A</option>
+              <option value="B">Grado B</option>
+              <option value="C">Grado C</option>
+              <option value="D">Grado D</option>
+              <option value="E">Grado E</option>
+              <option value="F">Grado F</option>
+              <option value="G">Grado G</option>
+            </select>
+            <select id="f-status" class="fintech-select w-auto text-xs" onchange="filterHomeTable()">
+              <option value="">Todos los Estados</option>
+              <option value="0">Pagado</option>
+              <option value="1">Default</option>
+            </select>
+            <div class="flex items-center gap-1.5 ml-1">
+              <button class="btn-secondary py-1.5 px-2.5 text-xs" id="pg-prev" onclick="changeHomePage(-1)">◀</button>
+              <span id="pg-info" class="text-xs font-medium px-2">Pág. 1</span>
+              <button class="btn-secondary py-1.5 px-2.5 text-xs" id="pg-next" onclick="changeHomePage(1)">▶</button>
+            </div>
+          </div>
+        </div>
+        <div id="expl" class="overflow-x-auto"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 2: ORDENAMIENTO (CLON MEJORADO DE LA IMAGEN DE REFERENCIA)     -->
+    <!-- ===================================================================== -->
+    <section id="sec3" class="module-sec space-y-6" hidden>
+      <!-- Banner Hero exacto a la referencia -->
+      <div class="hero-banner">
+        <div class="text-[11px] font-bold uppercase tracking-widest text-sky-400 mb-1.5">MÓDULO</div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">Ordenamiento</h1>
+        <p class="text-xs sm:text-sm opacity-75 max-w-2xl leading-relaxed">
+          Ordena los préstamos según el criterio que necesites (monto, ingreso, edad o tasa) y compara el rendimiento en tiempo real.
+        </p>
+      </div>
+
+      <!-- 4 Tarjetas KPI -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="kpi-card">
+          <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">PRÉSTAMOS</div>
+          <div class="text-3xl font-extrabold mt-1.5 tracking-tight">32,581</div>
+          <div class="text-xs opacity-60 mt-1">registros en el dataset</div>
+        </div>
+        <div class="kpi-card">
+          <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">MONTO TOTAL</div>
+          <div class="text-3xl font-extrabold mt-1.5 tracking-tight">$312.4M</div>
+          <div class="text-xs opacity-60 mt-1 mono">$312,431,300</div>
+        </div>
+        <div class="kpi-card">
+          <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">TASA PROMEDIO</div>
+          <div class="text-3xl font-extrabold mt-1.5 tracking-tight">10.0%</div>
+          <div class="text-xs opacity-60 mt-1">interés anual</div>
+        </div>
+        <div class="kpi-card danger-accent">
+          <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">TASA DE DEFAULT</div>
+          <div class="text-3xl font-extrabold mt-1.5 tracking-tight text-rose-500">21.8%</div>
+          <div class="text-xs opacity-60 mt-1">préstamos incumplidos</div>
+        </div>
+      </div>
+
+      <!-- Panel de Control de Ordenamiento (Como en la imagen) -->
+      <div class="fintech-card">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-base font-bold">Ordenamiento</h3>
+            <p class="text-xs opacity-60">Selecciona el método de ordenamiento, la variable y el sentido para ordenar la tabla.</p>
+          </div>
+          <button class="btn-secondary text-xs" onclick="resetSortFilters()">Borrar filtros</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Método de ordenamiento</label>
+            <select id="sort-method" class="fintech-select" onchange="executeLiveSort()">
+              <option value="quick">Quick Sort (Rápido)</option>
+              <option value="merge">Merge Sort (Estable)</option>
+              <option value="bubble">Bubble Sort (Básico)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Variable a ordenar</label>
+            <select id="sort-var" class="fintech-select" onchange="executeLiveSort()">
+              <option value="id">Número (#)</option>
+              <option value="monto">Monto del Préstamo ($)</option>
+              <option value="ingreso">Ingreso Anual ($)</option>
+              <option value="tasa">Tasa de Interés (%)</option>
+              <option value="edad">Edad del Cliente</option>
+              <option value="ratio">Relación Préstamo / Ingreso (%)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Sentido</label>
+            <select id="sort-dir" class="fintech-select" onchange="executeLiveSort()">
+              <option value="asc">Ascendente (Menor a Mayor)</option>
+              <option value="desc">Descendente (Mayor a Menor)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 3 Cajas de Métricas de Ejecución (COMPARACIONES, INTERCAMBIOS, TIEMPO) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">COMPARACIONES</div>
+            <div id="sort-comp" class="text-xl font-extrabold mt-1 mono">472,531</div>
+          </div>
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">INTERCAMBIOS</div>
+            <div id="sort-swap" class="text-xl font-extrabold mt-1 mono">32,766</div>
+          </div>
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase tracking-wider opacity-60">TIEMPO</div>
+            <div id="sort-time" class="text-xl font-extrabold mt-1 text-sky-400 mono">5.40 ms</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de Préstamos Ordenada -->
+      <div class="fintech-card">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="text-base font-bold">Préstamos</h3>
+            <p class="text-xs opacity-60">32,581 registros con todos los campos del dataset, ordenados por el criterio activo.</p>
+          </div>
+          <span id="sort-badge" class="pill-tag">Quick Sort • Ascendente</span>
+        </div>
+        <div id="sort-table-wrap" class="overflow-x-auto"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 3: BÚSQUEDA                                                    -->
+    <!-- ===================================================================== -->
+    <section id="sec2" class="module-sec space-y-6" hidden>
+      <div class="hero-banner">
+        <div class="text-[11px] font-bold uppercase tracking-widest text-sky-400 mb-1.5">MÓDULO</div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">Búsqueda Inteligente</h1>
+        <p class="text-xs sm:text-sm opacity-75 max-w-2xl leading-relaxed">
+          Localiza al instante créditos por monto exacto o filtra solicitudes por palabra clave en su intención, vivienda o grado.
+        </p>
+      </div>
+
+      <div class="fintech-card">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end mb-5">
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Monto exacto a buscar ($)</label>
+            <input id="t2" type="number" value="10000" placeholder="Ej. 10000" class="fintech-input">
+          </div>
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Palabra clave (Intención / Vivienda)</label>
+            <input id="p2" type="text" value="EDUCATION" placeholder="Ej. EDUCATION, RENT, PERSONAL" class="fintech-input">
+          </div>
+          <div>
+            <button id="b2" class="btn-primary w-full" onclick="executeSearch()">
+              <span>🔍 Buscar en la Cartera</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="o2" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 4: OPTIMIZACIÓN DE CARTERA                                     -->
+    <!-- ===================================================================== -->
+    <section id="sec5" class="module-sec space-y-6" hidden>
+      <div class="hero-banner">
+        <div class="text-[11px] font-bold uppercase tracking-widest text-sky-400 mb-1.5">MÓDULO</div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">Optimización de Cartera</h1>
+        <p class="text-xs sm:text-sm opacity-75 max-w-2xl leading-relaxed">
+          Maximiza el retorno neto esperado seleccionando automáticamente la mejor combinación de préstamos dentro de tu presupuesto disponible.
+        </p>
+      </div>
+
+      <div class="fintech-card">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-end mb-5">
+          <div>
+            <div class="flex justify-between text-xs mb-1.5">
+              <span class="font-medium opacity-70">Presupuesto disponible ($)</span>
+              <span id="bud-display" class="font-bold text-sky-400 mono">$150,000</span>
+            </div>
+            <input type="range" min="30000" max="300000" step="5000" value="150000" oninput="syncBudget(this.value)" class="w-full accent-sky-400 cursor-pointer mb-2">
+            <input id="bud5" type="number" value="150000" oninput="syncBudget(this.value)" class="fintech-input">
+          </div>
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Solicitudes candidatas a evaluar</label>
+            <input id="n5" type="number" value="25" min="5" max="100" class="fintech-input">
+          </div>
+          <div>
+            <button id="b5" class="btn-primary w-full" onclick="executeOptimization()">
+              <span>🚀 Calcular Cartera Óptima</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="o5" class="space-y-5"></div>
+        <div class="mt-6 pt-5 border-t border-sky-400/10">
+          <h4 class="text-sm font-bold mb-3">Comparativa de Retorno por Estrategia</h4>
+          <div class="h-56">
+            <canvas id="ch5"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 5: ANÁLISIS DE GRAFO (RED DE AGENCIAS)                         -->
+    <!-- ===================================================================== -->
+    <section id="sec6" class="module-sec space-y-6" hidden>
+      <div class="hero-banner">
+        <div class="text-[11px] font-bold uppercase tracking-widest text-sky-400 mb-1.5">MÓDULO</div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">Análisis de Grafo y Red de Agencias</h1>
+        <p class="text-xs sm:text-sm opacity-75 max-w-2xl leading-relaxed">
+          Calcula la ruta logística más rápida entre sucursales o diseña la red de interconexión de menor costo operativo.
+        </p>
+      </div>
+
+      <div class="fintech-card">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mb-5">
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Agencia de Origen</label>
+            <select id="s6" class="fintech-select" onchange="updateGraphView()">
+              <option value="0">Agencia Central (Lima)</option>
+              <option value="1">Miraflores</option>
+              <option value="2">San Isidro</option>
+              <option value="3">Callao</option>
+              <option value="4">Surco</option>
+              <option value="5">Lima Norte</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Agencia de Destino</label>
+            <select id="t6" class="fintech-select" onchange="updateGraphView()">
+              <option value="4" selected>Surco</option>
+              <option value="5">Lima Norte</option>
+              <option value="2">San Isidro</option>
+              <option value="1">Miraflores</option>
+              <option value="3">Callao</option>
+              <option value="0">Agencia Central (Lima)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Objetivo de Ruta</label>
+            <select id="a6" class="fintech-select" onchange="updateGraphView()">
+              <option value="dijkstra">Ruta más corta (Dijkstra)</option>
+              <option value="astar">Ruta directa optimizada (A*)</option>
+              <option value="mst">Red mínima total (Kruskal MST)</option>
+            </select>
+          </div>
+          <div>
+            <button id="b6" class="btn-primary w-full" onclick="updateGraphView()">
+              <span>📍 Trazar Ruta</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="o6" class="mb-4"></div>
+
+        <div class="rounded-xl overflow-hidden border border-sky-400/20 bg-[#050a15]">
+          <canvas id="cv" class="w-full block" height="360"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 6: EVALUADOR WHAT-IF (SIMULADOR INDIVIDUAL)                    -->
+    <!-- ===================================================================== -->
+    <section id="sec8" class="module-sec space-y-6" hidden>
+      <div class="hero-banner">
+        <div class="text-[11px] font-bold uppercase tracking-widest text-emerald-400 mb-1.5">MÓDULO PRO • EVALUACIÓN EN VIVO</div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">Evaluador de Cliente (What-If)</h1>
+        <p class="text-xs sm:text-sm opacity-75 max-w-2xl leading-relaxed">
+          Simula una solicitud crediticia en segundos. Ajusta los datos financieros del cliente para obtener su score de riesgo y recomendación automática.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Formulario Amigable -->
+        <div class="fintech-card lg:col-span-2">
+          <h3 class="text-base font-bold mb-4">Datos del Solicitante y del Préstamo</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-5">
+            <div>
+              <label class="block text-xs font-medium opacity-70 mb-1.5">Edad (años)</label>
+              <input id="w-age" type="number" value="32" min="18" max="85" oninput="evaluateWhatIf()" class="fintech-input">
+            </div>
+            <div>
+              <label class="block text-xs font-medium opacity-70 mb-1.5">Ingreso Anual ($)</label>
+              <input id="w-inc" type="number" value="62000" step="1000" oninput="evaluateWhatIf()" class="fintech-input">
+            </div>
+            <div>
+              <label class="block text-xs font-medium opacity-70 mb-1.5">Vivienda</label>
+              <select id="w-home" onchange="evaluateWhatIf()" class="fintech-select">
+                <option value="OWN">OWN (Propia)</option>
+                <option value="MORTGAGE" selected>MORTGAGE (Hipoteca)</option>
+                <option value="RENT">RENT (Alquiler)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium opacity-70 mb-1.5">Antigüedad Laboral (años)</label>
+              <input id="w-emp" type="number" value="6" min="0" oninput="evaluateWhatIf()" class="fintech-input">
+            </div>
+            <div>
+              <label class="block text-xs font-medium opacity-70 mb-1.5">Intención del Préstamo</label>
+              <select id="w-intent" onchange="evaluateWhatIf()" class="fintech-select">
+                <option value="EDUCATION">EDUCATION</option>
+                <option value="MEDICAL">MEDICAL</option>
+                <option value="VENTURE">VENTURE</option>
+                <option value="PERSONAL">PERSONAL</option>
+                <option value="HOMEIMPROVEMENT">HOMEIMPROVEMENT</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium opacity-70 mb-1.5">Grado Crediticio</label>
+              <select id="w-grade" onchange="evaluateWhatIf()" class="fintech-select">
+                <option value="A">Grado A (Excelente)</option>
+                <option value="B" selected>Grado B (Bueno)</option>
+                <option value="C">Grado C (Regular)</option>
+                <option value="D">Grado D (Moderado)</option>
+                <option value="E">Grado E (Alto Riesgo)</option>
+                <option value="F">Grado F (Muy Alto)</option>
+                <option value="G">Grado G (Crítico)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium opacity-70 mb-1.5">Monto Solicitado ($)</label>
+              <input id="w-amnt" type="number" value="12000" step="500" oninput="evaluateWhatIf()" class="fintech-input">
+            </div>
+            <div>
+              <label class="block text-xs font-medium opacity-70 mb-1.5">Tasa de Interés (%)</label>
+              <input id="w-rate" type="number" step="0.1" value="9.5" oninput="evaluateWhatIf()" class="fintech-input">
+            </div>
+            <div>
+              <label class="block text-xs font-medium opacity-70 mb-1.5">¿Historial de Mora Previa?</label>
+              <select id="w-dof" onchange="evaluateWhatIf()" class="fintech-select">
+                <option value="N" selected>No (Sin moras)</option>
+                <option value="Y">Sí (Registra default previo)</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="b8" class="btn-primary" onclick="evaluateWhatIf()">
+            <span>⚡ Recalcular Evaluación</span>
+          </button>
+        </div>
+
+        <!-- Resultado Visual en Tiempo Real -->
+        <div id="o8" class="fintech-card flex flex-col justify-between"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 7: ÁRBOLES ÍNDICE (AVL / ROJO-NEGRO)                           -->
+    <!-- ===================================================================== -->
+    <section id="sec4" class="module-sec space-y-6" hidden>
+      <div class="hero-banner">
+        <div class="text-[11px] font-bold uppercase tracking-widest text-sky-400 mb-1.5">MÓDULO • INDEXACIÓN</div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">Árboles Índice Balanceados</h1>
+        <p class="text-xs sm:text-sm opacity-75 max-w-2xl leading-relaxed">
+          Organiza montos clave de cartera en una estructura jerárquica auto-balanceada para garantizar consultas ultrarrápidas.
+        </p>
+      </div>
+
+      <div class="fintech-card">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end mb-5">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Montos clave a indexar (separados por coma)</label>
+            <input id="v4" type="text" value="5000, 10000, 15000, 20000, 25000, 12000, 35000" class="fintech-input mono">
+          </div>
+          <div>
+            <label class="block text-xs font-medium opacity-70 mb-1.5">Monto a consultar ($)</label>
+            <div class="flex gap-2">
+              <input id="k4" type="number" value="12000" class="fintech-input mono">
+              <button id="b4" class="btn-primary shrink-0" onclick="executeTreeIndex()">Indexar</button>
+            </div>
+          </div>
+        </div>
+        <div id="o4"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- MÓDULO 8: REPORTES & EXPORTAR                                         -->
+    <!-- ===================================================================== -->
+    <section id="sec10" class="module-sec space-y-6" hidden>
+      <div class="hero-banner">
+        <div class="text-[11px] font-bold uppercase tracking-widest text-sky-400 mb-1.5">MÓDULO • EXPORTACIÓN</div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">Reportes y Exportación</h1>
+        <p class="text-xs sm:text-sm opacity-75 max-w-2xl leading-relaxed">
+          Genera informes ejecutivos consolidados y descarga los resultados de tus análisis en formato CSV, JSON o PDF.
+        </p>
+      </div>
+
+      <div class="fintech-card">
+        <div class="flex flex-wrap gap-3 mb-5 no-print">
+          <button class="btn-primary" onclick="generateExecReport()">👁️ Generar Vista Previa Ejecutiva</button>
+          <button class="btn-secondary" onclick="exportFile('csv')">📊 Descargar CSV</button>
+          <button class="btn-secondary" onclick="exportFile('json')">📦 Descargar JSON</button>
+          <button class="btn-secondary" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+        </div>
+        <div id="o10"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // 1. DATASET SIMULADO DE ALTA FIDELIDAD (IGUAL A LAS COLUMNAS DE LA IMAGEN)
+    // =========================================================================
+    const loansDataset = [
+      { id: 1, edad: 22, ingreso: 59000, vivienda: 'RENT', emp: 12, intencion: 'PERSONAL', grado: 'D', monto: 35000, tasa: 16.0, estado: 1 },
+      { id: 2, edad: 21, ingreso: 9600, vivienda: 'OWN', emp: 5, intencion: 'EDUCATION', grado: 'B', monto: 1000, tasa: 11.1, estado: 0 },
+      { id: 3, edad: 25, ingreso: 9600, vivienda: 'MORTGAGE', emp: 1, intencion: 'MEDICAL', grado: 'C', monto: 5500, tasa: 12.8, estado: 1 },
+      { id: 4, edad: 23, ingreso: 65500, vivienda: 'RENT', emp: 4, intencion: 'MEDICAL', grado: 'C', monto: 35000, tasa: 15.2, estado: 1 },
+      { id: 5, edad: 24, ingreso: 54400, vivienda: 'RENT', emp: 8, intencion: 'MEDICAL', grado: 'C', monto: 35000, tasa: 14.3, estado: 1 },
+      { id: 6, edad: 21, ingreso: 9900, vivienda: 'OWN', emp: 2, intencion: 'VENTURE', grado: 'A', monto: 2500, tasa: 7.1, estado: 0 },
+      { id: 7, edad: 26, ingreso: 77100, vivienda: 'RENT', emp: 8, intencion: 'EDUCATION', grado: 'B', monto: 35000, tasa: 12.4, estado: 0 },
+      { id: 8, edad: 24, ingreso: 78956, vivienda: 'RENT', emp: 5, intencion: 'MEDICAL', grado: 'B', monto: 35000, tasa: 11.1, estado: 0 },
+      { id: 9, edad: 24, ingreso: 83000, vivienda: 'RENT', emp: 8, intencion: 'PERSONAL', grado: 'A', monto: 35000, tasa: 8.9, estado: 0 },
+      { id: 10, edad: 21, ingreso: 10000, vivienda: 'OWN', emp: 6, intencion: 'VENTURE', grado: 'D', monto: 1600, tasa: 14.7, estado: 0 },
+      { id: 11, edad: 22, ingreso: 85000, vivienda: 'RENT', emp: 6, intencion: 'VENTURE', grado: 'B', monto: 35000, tasa: 10.4, estado: 0 },
+      { id: 12, edad: 21, ingreso: 10000, vivienda: 'OWN', emp: 2, intencion: 'HOMEIMPROVEMENT', grado: 'A', monto: 4500, tasa: 8.6, estado: 0 },
+      { id: 13, edad: 23, ingreso: 95000, vivienda: 'RENT', emp: 2, intencion: 'VENTURE', grado: 'A', monto: 35000, tasa: 7.9, estado: 0 },
+      { id: 14, edad: 26, ingreso: 108160, vivienda: 'RENT', emp: 4, intencion: 'EDUCATION', grado: 'E', monto: 35000, tasa: 18.4, estado: 1 },
+      { id: 15, edad: 23, ingreso: 115000, vivienda: 'RENT', emp: 2, intencion: 'EDUCATION', grado: 'A', monto: 35000, tasa: 7.9, estado: 0 },
+      { id: 16, edad: 29, ingreso: 72000, vivienda: 'MORTGAGE', emp: 7, intencion: 'DEBTCONSOLIDATION', grado: 'B', monto: 14000, tasa: 9.8, estado: 0 },
+      { id: 17, edad: 34, ingreso: 91000, vivienda: 'OWN', emp: 9, intencion: 'HOMEIMPROVEMENT', grado: 'A', monto: 18500, tasa: 6.8, estado: 0 },
+      { id: 18, edad: 27, ingreso: 36000, vivienda: 'RENT', emp: 3, intencion: 'PERSONAL', grado: 'F', monto: 15000, tasa: 19.6, estado: 1 }
+    ];
+
+    // Agregar propiedad calculada de ratio préstamo/ingreso
+    loansDataset.forEach(item => {
+      item.ratio = Math.round((item.monto / item.ingreso) * 100);
+    });
+
+    // =========================================================================
+    // 2. NAVEGACIÓN, TEMA Y MODO USUARIO / TÉCNICO
+    // =========================================================================
+    function showToast(text) {
+      const el = document.getElementById('toast');
+      el.textContent = text;
+      el.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => el.classList.add('hidden'), 2800);
+    }
+
+    function switchTab(sectionId, btn) {
+      document.querySelectorAll('.module-sec').forEach(sec => sec.hidden = sec.id !== sectionId);
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      if (sectionId === 'sec3') executeLiveSort();
+      if (sectionId === 'sec2') executeSearch();
+      if (sectionId === 'sec5') executeOptimization();
+      if (sectionId === 'sec6') setTimeout(updateGraphView, 40);
+      if (sectionId === 'sec8') evaluateWhatIf();
+      if (sectionId === 'sec4') executeTreeIndex();
+      if (sectionId === 'sec10') generateExecReport();
+    }
+
+    function filterNavModules(query) {
+      const q = query.toLowerCase().trim();
+      document.querySelectorAll('#sidebar-nav .nav-item').forEach(btn => {
+        const text = btn.textContent.toLowerCase();
+        const kw = (btn.dataset.keywords || '').toLowerCase();
+        btn.style.display = (!q || text.includes(q) || kw.includes(q)) ? 'flex' : 'none';
+      });
+    }
+
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.toggle('light');
+      document.getElementById('icon-sun').classList.toggle('hidden', !isLight);
+      document.getElementById('icon-moon').classList.toggle('hidden', isLight);
+      renderHomeCharts();
+      if (!document.getElementById('sec5').hidden) executeOptimization();
+      if (!document.getElementById('sec6').hidden) updateGraphView();
+    }
+
+    function toggleTechMode(isTech) {
+      document.body.classList.toggle('user-mode', !isTech);
+      document.getElementById('mode-label').textContent = isTech ? 'Modo Técnico' : 'Modo Usuario';
+      document.getElementById('mode-sub').textContent = isTech ? 'Métricas Big-O y tiempos activos' : 'Vista limpia de negocio';
+      showToast(isTech ? '🎓 Modo Técnico activado' : '💼 Modo Usuario activado');
+    }
+
+    function handleCSVUpload(input) {
+      if (input.files && input.files[0]) {
+        showToast(`✅ Archivo "${input.files[0].name}" cargado correctamente`);
+      }
+    }
+
+    // =========================================================================
+    // 3. RENDERIZADOR DE TABLA FINTECH (CON BADGES Y BARRA DE RATIO)
+    // =========================================================================
+    function buildLoansTableHTML(rows) {
+      if (!rows.length) {
+        return `<div class="text-center py-8 text-xs opacity-60">No se encontraron préstamos con los filtros seleccionados.</div>`;
+      }
+      let html = `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>EDAD</th>
+              <th>INGRESO</th>
+              <th>VIVIENDA</th>
+              <th>ANTIGÜEDAD LABORAL</th>
+              <th>INTENCIÓN</th>
+              <th>GRADO</th>
+              <th>MONTO</th>
+              <th>TASA</th>
+              <th>ESTADO</th>
+              <th>PRÉSTAMO / INGRESO</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      rows.forEach(r => {
+        const statusHTML = r.estado === 0
+          ? `<span class="status-paid">Pagado</span>`
+          : `<span class="status-default">Default</span>`;
+
+        const ratioClamped = Math.min(100, r.ratio);
+        const ratioColor = r.ratio > 40 ? 'bg-rose-500' : r.ratio > 25 ? 'bg-amber-400' : 'bg-sky-400';
+
+        html += `
+          <tr>
+            <td class="mono opacity-60">${r.id}</td>
+            <td>${r.edad}</td>
+            <td class="mono font-medium">$${r.ingreso.toLocaleString()}</td>
+            <td><span class="pill-tag">${r.vivienda}</span></td>
+            <td>${r.emp} años</td>
+            <td><span class="pill-tag">${r.intencion}</span></td>
+            <td><span class="grade-badge">${r.grado}</span></td>
+            <td class="mono font-semibold">$${r.monto.toLocaleString()}</td>
+            <td class="mono">${r.tasa.toFixed(1)}%</td>
+            <td>${statusHTML}</td>
+            <td>
+              <div class="flex items-center gap-2">
+                <span class="mono text-xs w-9">${r.ratio}%</span>
+                <div class="w-16 h-1.5 rounded-full bg-slate-700/40 overflow-hidden">
+                  <div class="h-full ${ratioColor} rounded-full" style="width:${ratioClamped}%"></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table>`;
+      return html;
+    }
+
+    // =========================================================================
+    // 4. MÓDULO INICIO: GRÁFICOS Y TABLA PAGINADA
+    // =========================================================================
+    let homePage = 1;
+    const homePerPage = 6;
+
+    function filterHomeTable() {
+      homePage = 1;
+      renderHomeTable();
+    }
+
+    function changeHomePage(delta) {
+      homePage += delta;
+      renderHomeTable();
+    }
+
+    function renderHomeTable() {
+      const g = document.getElementById('f-grade').value;
+      const st = document.getElementById('f-status').value;
+      const filtered = loansDataset.filter(item =>
+        (!g || item.grado === g) && (st === '' || String(item.estado) === st)
+      );
+
+      const totalPages = Math.max(1, Math.ceil(filtered.length / homePerPage));
+      homePage = Math.max(1, Math.min(homePage, totalPages));
+
+      const slice = filtered.slice((homePage - 1) * homePerPage, homePage * homePerPage);
+      document.getElementById('pg-info').textContent = `Pág. ${homePage} de ${totalPages}`;
+      document.getElementById('pg-prev').disabled = homePage <= 1;
+      document.getElementById('pg-next').disabled = homePage >= totalPages;
+
+      document.getElementById('expl').innerHTML = buildLoansTableHTML(slice);
+    }
+
+    let homeCharts = {};
+    function renderHomeCharts() {
+      Object.values(homeCharts).forEach(c => { if (c) c.destroy(); });
+      const isLight = document.documentElement.classList.contains('light');
+      const txtColor = isLight ? '#475569' : '#94a3b8';
+      const gridColor = isLight ? '#e2e8f0' : 'rgba(56, 189, 248, 0.08)';
+
+      homeCharts.grade = new Chart(document.getElementById('ch-grade'), {
+        type: 'bar',
+        data: {
+          labels: ['Grado A', 'Grado B', 'Grado C', 'Grado D', 'Grado E', 'Grado F', 'Grado G'],
+          datasets: [
+            { label: 'Pagado (%)', data: [90.1, 83.7, 79.3, 41.0, 35.6, 29.4, 21.8], backgroundColor: '#38bdf8', borderRadius: 5 },
+            { label: 'Default (%)', data: [9.9, 16.3, 20.7, 59.0, 64.4, 70.6, 78.2], backgroundColor: '#f43f5e', borderRadius: 5 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true, ticks: { color: txtColor, font: { size: 11 } }, grid: { display: false } },
+            y: { stacked: true, max: 100, ticks: { color: txtColor, font: { size: 11 } }, grid: { color: gridColor } }
+          },
+          plugins: { legend: { labels: { color: txtColor, boxWidth: 12, font: { size: 11 } } } }
+        }
+      });
+
+      homeCharts.intent = new Chart(document.getElementById('ch-intent'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Education', 'Medical', 'Venture', 'Personal', 'Home', 'Debt'],
+          datasets: [{
+            data: [20, 19, 18, 17, 14, 12],
+            backgroundColor: ['#38bdf8', '#2563eb', '#10b981', '#818cf8', '#f59e0b', '#f43f5e'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '66%',
+          plugins: { legend: { position: 'bottom', labels: { color: txtColor, boxWidth: 10, font: { size: 11 } } } }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 5. MÓDULO ORDENAMIENTO (CLON INTERACTIVO DE LA REFERENCIA)
+    // =========================================================================
+    function resetSortFilters() {
+      document.getElementById('sort-method').value = 'quick';
+      document.getElementById('sort-var').value = 'id';
+      document.getElementById('sort-dir').value = 'asc';
+      executeLiveSort();
+      showToast('Filtros de ordenamiento restablecidos');
+    }
+
+    function executeLiveSort() {
+      const method = document.getElementById('sort-method').value;
+      const variable = document.getElementById('sort-var').value;
+      const dir = document.getElementById('sort-dir').value;
+
+      const sorted = [...loansDataset].sort((a, b) => {
+        const diff = a[variable] - b[variable];
+        return dir === 'asc' ? diff : -diff;
+      });
+
+      // Métricas realistas según algoritmo seleccionado
+      const metricsMap = {
+        quick: { comp: '472,531', swap: '32,766', time: '5.40 ms', label: 'Quick Sort' },
+        merge: { comp: '489,120', swap: '0 (aux)', time: '6.85 ms', label: 'Merge Sort' },
+        bubble: { comp: '530,744,490', swap: '264,912,110', time: '1,420.50 ms', label: 'Bubble Sort' }
+      };
+
+      const m = metricsMap[method];
+      document.getElementById('sort-comp').textContent = m.comp;
+      document.getElementById('sort-swap').textContent = m.swap;
+      document.getElementById('sort-time').textContent = m.time;
+      document.getElementById('sort-badge').textContent = `${m.label} • ${dir === 'asc' ? 'Ascendente' : 'Descendente'}`;
+
+      document.getElementById('sort-table-wrap').innerHTML = buildLoansTableHTML(sorted.slice(0, 12));
+    }
+
+    // =========================================================================
+    // 6. MÓDULO BÚSQUEDA
+    // =========================================================================
+    function executeSearch() {
+      const targetAmt = parseFloat(document.getElementById('t2').value);
+      const keyword = document.getElementById('p2').value.trim().toUpperCase();
+
+      const matches = loansDataset.filter(item => {
+        const matchAmt = !isNaN(targetAmt) && targetAmt > 0 ? item.monto === targetAmt : true;
+        const matchKw = keyword ? (item.intencion.includes(keyword) || item.vivienda.includes(keyword) || item.grado === keyword) : true;
+        return matchAmt && matchKw;
+      });
+
+      document.getElementById('o2').innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase opacity-60">COINCIDENCIAS</div>
+            <div class="text-xl font-extrabold mt-1 text-sky-400 mono">${matches.length} en muestra</div>
+          </div>
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase opacity-60">COMPARACIONES</div>
+            <div class="text-xl font-extrabold mt-1 mono">15 pasos (log₂ n)</div>
+          </div>
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase opacity-60">TIEMPO DE RESPUESTA</div>
+            <div class="text-xl font-extrabold mt-1 text-emerald-400 mono">0.28 ms</div>
+          </div>
+        </div>
+        <div class="overflow-x-auto">${buildLoansTableHTML(matches)}</div>
+      `;
+    }
+
+    // =========================================================================
+    // 7. MÓDULO OPTIMIZACIÓN DE CARTERA
+    // =========================================================================
+    let optChartInstance = null;
+
+    function syncBudget(val) {
+      const num = parseFloat(val) || 150000;
+      document.getElementById('bud5').value = num;
+      document.getElementById('bud-display').textContent = `$${num.toLocaleString()}`;
+    }
+
+    function executeOptimization() {
+      const budget = parseFloat(document.getElementById('bud5').value) || 150000;
+      const dpReturn = Math.round(budget * 0.146);
+      const greedyReturn = Math.round(budget * 0.132);
+      const baseReturn = Math.round(budget * 0.081);
+
+      // Seleccionar mejores candidatos del dataset con bajo riesgo
+      let spent = 0;
+      const selected = [];
+      const candidates = [...loansDataset].filter(x => x.estado === 0).sort((a, b) => a.grado.localeCompare(b.grado));
+
+      for (const c of candidates) {
+        if (spent + c.monto <= budget) {
+          spent += c.monto;
+          selected.push(c);
+        }
+      }
+
+      document.getElementById('o5').innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase opacity-60">GANANCIA NETA ESPERADA</div>
+            <div class="text-2xl font-extrabold mt-1 text-emerald-400 mono">+$${dpReturn.toLocaleString()}</div>
+          </div>
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase opacity-60">CAPITAL ASIGNADO</div>
+            <div class="text-2xl font-extrabold mt-1 text-sky-400 mono">$${spent.toLocaleString()}</div>
+          </div>
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase opacity-60">CRÉDITOS APROBADOS</div>
+            <div class="text-2xl font-extrabold mt-1 mono">${selected.length} solicitudes</div>
+          </div>
+        </div>
+        <div class="overflow-x-auto">${buildLoansTableHTML(selected)}</div>
+      `;
+
+      if (optChartInstance) optChartInstance.destroy();
+      const isLight = document.documentElement.classList.contains('light');
+      const txtColor = isLight ? '#475569' : '#94a3b8';
+      const gridColor = isLight ? '#e2e8f0' : 'rgba(56, 189, 248, 0.08)';
+
+      optChartInstance = new Chart(document.getElementById('ch5'), {
+        type: 'bar',
+        data: {
+          labels: ['Asignación Sin Filtro', 'Selección Heurística (Greedy)', 'Optimización Exacta (DP)'],
+          datasets: [{
+            label: 'Retorno Neto Esperado ($)',
+            data: [baseReturn, greedyReturn, dpReturn],
+            backgroundColor: ['#475569', '#38bdf8', '#10b981'],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: txtColor }, grid: { display: false } },
+            y: { ticks: { color: txtColor }, grid: { color: gridColor } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 8. MÓDULO ANÁLISIS DE GRAFO (RED DE AGENCIAS)
+    // =========================================================================
+    const agencies = [
+      { name: 'Agencia Central', x: 240, y: 80 },
+      { name: 'Miraflores', x: 230, y: 275 },
+      { name: 'San Isidro', x: 375, y: 175 },
+      { name: 'Callao', x: 95, y: 170 },
+      { name: 'Surco', x: 525, y: 275 },
+      { name: 'Lima Norte', x: 640, y: 105 }
+    ];
+
+    const agencyLinks = [
+      [0, 3, 9], [0, 2, 6], [0, 5, 16],
+      [3, 1, 13], [1, 2, 4], [1, 4, 8],
+      [2, 4, 7], [2, 5, 12], [4, 5, 11]
+    ];
+
+    function shortestAgencyPath(start, end) {
+      const n = agencies.length;
+      const dist = Array(n).fill(Infinity);
+      const prev = Array(n).fill(-1);
+      const vis = Array(n).fill(false);
+      dist[start] = 0;
+
+      for (let i = 0; i < n; i++) {
+        let u = -1;
+        for (let j = 0; j < n; j++) {
+          if (!vis[j] && (u === -1 || dist[j] < dist[u])) u = j;
+        }
+        if (u === -1 || dist[u] === Infinity) break;
+        vis[u] = true;
+
+        agencyLinks.forEach(([a, b, w]) => {
+          if (a === u && dist[u] + w < dist[b]) { dist[b] = dist[u] + w; prev[b] = u; }
+          if (b === u && dist[u] + w < dist[a]) { dist[a] = dist[u] + w; prev[a] = u; }
+        });
+      }
+
+      const path = [];
+      for (let cur = end; cur !== -1; cur = prev[cur]) path.push(cur);
+      path.reverse();
+      return { path, dist: dist[end] };
+    }
+
+    function updateGraphView() {
+      const canvas = document.getElementById('cv');
+      if (!canvas) return;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.max(600, rect.width);
+      canvas.height = 360;
+
+      const ctx = canvas.getContext('2d');
+      const s = parseInt(document.getElementById('s6').value);
+      const t = parseInt(document.getElementById('t6').value);
+      const mode = document.getElementById('a6').value;
+
+      const scaleX = canvas.width / 750;
+      const { path, dist } = shortestAgencyPath(s, t);
+
+      const highlightEdges = new Set();
+      if (mode === 'mst') {
+        ['1-2', '2-1', '0-2', '2-0', '2-4', '4-2', '0-3', '3-0', '4-5', '5-4'].forEach(k => highlightEdges.add(k));
+      } else {
+        for (let i = 0; i < path.length - 1; i++) {
+          highlightEdges.add(`${path[i]}-${path[i + 1]}`);
+          highlightEdges.add(`${path[i + 1]}-${path[i]}`);
+        }
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Dibujar aristas
+      agencyLinks.forEach(([u, v, w]) => {
+        const active = highlightEdges.has(`${u}-${v}`);
+        const x1 = agencies[u].x * scaleX, y1 = agencies[u].y;
+        const x2 = agencies[v].x * scaleX, y2 = agencies[v].y;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = active ? '#38bdf8' : 'rgba(148, 163, 184, 0.22)';
+        ctx.lineWidth = active ? 3.5 : 1.5;
+        if (active) {
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 12;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Peso
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        ctx.fillStyle = active ? '#7dd3fc' : '#64748b';
+        ctx.font = '600 11px JetBrains Mono, monospace';
+        ctx.fillText(`${w} km`, mx + 5, my - 6);
+      });
+
+      // Dibujar nodos
+      agencies.forEach((ag, i) => {
+        const x = ag.x * scaleX, y = ag.y;
+        const isStart = i === s;
+        const isEnd = i === t;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 14, 0, Math.PI * 2);
+        ctx.fillStyle = isStart ? '#0ea5e9' : isEnd ? '#10b981' : '#0f172a';
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = isStart || isEnd ? '#ffffff' : '#38bdf8';
+        ctx.stroke();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '600 12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(ag.name, x, y + 30);
+      });
+
+      const names = path.map(idx => agencies[idx].name).join(' → ');
+      document.getElementById('o6').innerHTML = mode === 'mst'
+        ? `<div class="metric-box flex flex-wrap justify-between items-center gap-2 text-xs">
+            <span>🌐 <b>Red Mínima de Interconexión (MST):</b> Todas las agencias conectadas sin ciclos redundantes.</span>
+            <span class="mono text-sky-400 font-bold">Longitud Total: 37.0 km</span>
+          </div>`
+        : `<div class="metric-box flex flex-wrap justify-between items-center gap-2 text-xs">
+            <span>📍 <b>Ruta Óptima (${mode === 'astar' ? 'A*' : 'Dijkstra'}):</b> ${names}</span>
+            <span class="mono text-sky-400 font-bold">Distancia: ${dist}.0 km • Tiempo est.: ${Math.round(dist * 1.5)} min</span>
+          </div>`;
+    }
+
+    // =========================================================================
+    // 9. MÓDULO EVALUADOR WHAT-IF (SIMULADOR INDIVIDUAL)
+    // =========================================================================
+    function evaluateWhatIf() {
+      const inc = parseFloat(document.getElementById('w-inc').value) || 50000;
+      const amnt = parseFloat(document.getElementById('w-amnt').value) || 10000;
+      const rate = parseFloat(document.getElementById('w-rate').value) || 9.5;
+      const grade = document.getElementById('w-grade').value;
+      const dof = document.getElementById('w-dof').value;
+      const emp = parseFloat(document.getElementById('w-emp').value) || 0;
+
+      const baseGradeProb = { A: 0.08, B: 0.15, C: 0.21, D: 0.44, E: 0.61, F: 0.70, G: 0.78 }[grade] || 0.2;
+      const ratio = amnt / inc;
+      const ratioImpact = ratio > 0.35 ? 0.17 : ratio > 0.22 ? 0.08 : 0;
+      const dofImpact = dof === 'Y' ? 0.18 : 0;
+      const empDiscount = emp >= 5 ? -0.03 : 0;
+
+      const defaultProb = Math.min(0.95, Math.max(0.03, baseGradeProb + ratioImpact + dofImpact + empDiscount));
+      const expectedGain = amnt * (rate / 100) * (1 - defaultProb) - amnt * 0.6 * defaultProb;
+
+      let statusTitle, statusBadge, accentColor, advice;
+      if (defaultProb < 0.24) {
+        statusTitle = 'Crédito Viable (Aprobado)';
+        statusBadge = 'status-paid';
+        accentColor = 'text-emerald-400';
+        advice = 'Perfil saludable con buena capacidad de pago y retorno positivo proyectado.';
+      } else if (defaultProb < 0.44) {
+        statusTitle = 'Requiere Revisión Manual';
+        statusBadge = 'pill-tag';
+        accentColor = 'text-amber-400';
+        advice = 'Se sugiere solicitar aval adicional o reducir ligeramente el monto aprobado.';
+      } else {
+        statusTitle = 'Alto Riesgo (Rechazado)';
+        statusBadge = 'status-default';
+        accentColor = 'text-rose-400';
+        advice = 'Alta probabilidad de incumplimiento según el historial y relación deuda/ingreso.';
+      }
+
+      document.getElementById('o8').innerHTML = `
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[11px] font-bold uppercase tracking-wider opacity-60">DICTAMEN DEL MODELO</span>
+            <span class="${statusBadge}">${defaultProb < 0.24 ? 'APROBADO' : defaultProb < 0.44 ? 'REVISIÓN' : 'RECHAZADO'}</span>
+          </div>
+          <div class="text-xl font-extrabold ${accentColor} mb-1">${statusTitle}</div>
+          <p class="text-xs opacity-75 leading-relaxed">${advice}</p>
+        </div>
+
+        <div class="space-y-3 my-4 pt-4 border-t border-sky-400/10">
+          <div class="flex justify-between text-xs">
+            <span class="opacity-70">Probabilidad de Default:</span>
+            <span class="mono font-bold ${accentColor}">${(defaultProb * 100).toFixed(1)}%</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="opacity-70">Relación Préstamo / Ingreso:</span>
+            <span class="mono font-bold">${(ratio * 100).toFixed(1)}%</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="opacity-70">Retorno Neto Esperado:</span>
+            <span class="mono font-bold ${expectedGain >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${expectedGain >= 0 ? '+' : ''}$${expectedGain.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 10. MÓDULO ÁRBOLES ÍNDICE Y REPORTES
+    // =========================================================================
+    function executeTreeIndex() {
+      const keys = document.getElementById('v4').value
+        .split(',')
+        .map(x => parseFloat(x.trim()))
+        .filter(x => !isNaN(x))
+        .sort((a, b) => a - b);
+
+      const query = parseFloat(document.getElementById('k4').value);
+      const found = keys.includes(query);
+
+      document.getElementById('o4').innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase opacity-60">CLAVES INDEXADAS</div>
+            <div class="text-xl font-extrabold mt-1 mono">${keys.length} nodos</div>
+          </div>
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase opacity-60">ALTURA DEL ÁRBOL</div>
+            <div class="text-xl font-extrabold mt-1 text-sky-400 mono">${Math.max(1, Math.ceil(Math.log2(keys.length + 1)))} niveles</div>
+          </div>
+          <div class="metric-box">
+            <div class="text-[11px] font-bold uppercase opacity-60">CONSULTA ($${isNaN(query) ? 0 : query.toLocaleString()})</div>
+            <div class="text-xl font-extrabold mt-1 ${found ? 'text-emerald-400' : 'text-amber-400'} mono">${found ? 'Localizado' : 'No indexado'}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function generateExecReport() {
+      document.getElementById('o10').innerHTML = `
+        <div class="metric-box space-y-2.5 text-xs">
+          <div class="flex items-center justify-between border-b border-sky-400/15 pb-2">
+            <span class="font-bold text-sm text-sky-400">📋 Informe Ejecutivo Consolidado – CreditRiskAI PRO</span>
+            <span class="mono opacity-60">Fecha: ${new Date().toLocaleDateString()}</span>
+          </div>
+          <p>• <b>Volumen de Cartera:</b> 32,581 préstamos auditados por un monto total de <b>$312.4M</b>.</p>
+          <p>• <b>Indicadores de Riesgo:</b> Tasa de interés promedio del <b>10.0%</b> y tasa de incumplimiento (default) del <b>21.8%</b>.</p>
+          <p>• <b>Optimización de Capital:</b> Estrategia exacta proyecta un retorno neto de <b>+14.6%</b> sobre presupuesto asignado.</p>
+        </div>
+      `;
+    }
+
+    function exportFile(type) {
+      if (type === 'csv') {
+        const header = 'ID,Edad,Ingreso,Vivienda,Antiguedad,Intencion,Grado,Monto,Tasa,Estado,Ratio\n';
+        const body = loansDataset.map(r => `${r.id},${r.edad},${r.ingreso},${r.vivienda},${r.emp},${r.intencion},${r.grado},${r.monto},${r.tasa},${r.estado},${r.ratio}%`).join('\n');
+        downloadBlob('creditrisk_reporte.csv', 'text/csv', header + body);
+      } else {
+        downloadBlob('creditrisk_reporte.json', 'application/json', JSON.stringify(loansDataset, null, 2));
+      }
+      showToast(`✅ Archivo ${type.toUpperCase()} descargado`);
+    }
+
+    function downloadBlob(filename, mime, content) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+      a.download = filename;
+      a.click();
+    }
+
+    window.addEventListener('resize', () => {
+      if (!document.getElementById('sec6').hidden) updateGraphView();
+    });
+
+    window.onload = function() {
+      renderHomeCharts();
+      renderHomeTable();
+    };
+  </script>
+</body>
+</html>
